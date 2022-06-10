@@ -1,1 +1,1 @@
-flask run
+flask run -p $1

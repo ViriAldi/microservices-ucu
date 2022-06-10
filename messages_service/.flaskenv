@@ -1,2 +1,8 @@
 FLASK_APP=service
 FLASK_ENV=development
+
+SERVICE_NAME=messages-service
+SERVICE_HOST=127.0.0.1
+
+CONSUL_HOST=localhost
+CONSUL_PORT=8500
