@@ -17,7 +17,7 @@ def handle_post():
     messages_storage.put(uid, msg)
     messages_storage.unlock(uid)
 
-    app.logger.info(f"{msg}")
+    app.logger.info(f"Received {msg}")
     return "", 200
 
 

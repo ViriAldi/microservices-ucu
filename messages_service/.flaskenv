@@ -1,3 +1,2 @@
 FLASK_APP=service
-FLASK_RUN_PORT=8004
 FLASK_ENV=development
