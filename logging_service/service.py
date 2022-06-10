@@ -1,15 +1,11 @@
 from flask import Flask, request
-import logging
+import hazelcast
 
-HTTP_HOST = "http://127.0.0.1"
-FACADE_PORT = 8000
-LOGGING_PORT = 8001
-FACADE_URL = f"{HTTP_HOST}:{FACADE_PORT}"
 
-logger = logging.getLogger(__name__)
 app = Flask(__name__)
-
-messages_storage = {}
+client = hazelcast.HazelcastClient()
+messages_storage = client.get_map("logging-map").blocking()
+messages_storage.clear()
 
 
 @app.post("/")
@@ -17,9 +13,11 @@ def handle_post():
     uid = request.get_json()["UUID"]
     msg = request.get_json()["msg"]
 
-    messages_storage[uid] = msg
-    app.logger.info(f"{msg}")
+    messages_storage.lock(uid)
+    messages_storage.put(uid, msg)
+    messages_storage.unlock(uid)
 
+    app.logger.info(f"{msg}")
     return "", 200
 
 
@@ -32,5 +30,4 @@ def handle_get():
 
 
 if __name__ == "__main__":
-    logging.info("Logging service has started")
-    app.run(debug=True)
+    app.run()

@@ -1,17 +1,15 @@
 from flask import Flask, request
-import logging
 import requests
+import random
 import uuid
 
 HTTP_HOST = "http://127.0.0.1"
-FACADE_PORT = 8000
-LOGGING_PORT = 8001
-MESSAGES_PORT = 8002
+LOGGING_PORT_LIST = [8001, 8002, 8003]
+MESSAGES_PORT = 8004
 
-LOGGING_URL = f"{HTTP_HOST}:{LOGGING_PORT}"
+LOGGING_URLS = [f"{HTTP_HOST}:{PORT}" for PORT in LOGGING_PORT_LIST]
 MESSAGES_URL = f"{HTTP_HOST}:{MESSAGES_PORT}"
 
-# logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 
@@ -24,23 +22,23 @@ def handle_post():
         "UUID": uid,
         "msg": msg,
     }
-    logging_response = requests.post(LOGGING_URL, json=logging_body)
 
-    return {}, logging_response.status_code
+    logging_url = random.choice(LOGGING_URLS)
+    logging_response = requests.post(logging_url, json=logging_body)
+
+    return "", logging_response.status_code
 
 
 @app.get("/facade_service")
 def handle_get():
-    logging_response = requests.get(LOGGING_URL).json()["concat_msgs"]
+    logging_url = random.choice(LOGGING_URLS)
+    logging_response = requests.get(logging_url).json()["concat_msgs"]
     messages_response = requests.get(MESSAGES_URL).json()["msg"]
 
-    response_body = {
-        "concat_msgs": " ".join([logging_response, messages_response]),
-    }
-
-    return response_body, 200
+    response = " ".join([logging_response, messages_response])
+    return response
 
 
 if __name__ == "__main__":
     app.logger.info("Facade service has started")
-    app.run(debug=True)
+    app.run()
