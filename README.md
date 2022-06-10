@@ -1,3 +1,9 @@
+# Task 1
+
+### HTTP requests
+```shell
+
+```
 # Task 2
 
 ### Distributed map data consistency
